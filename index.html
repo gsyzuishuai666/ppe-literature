@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PPE 专业文献查询</title>
+<style>
+  :root {
+    --politics: #3b82f6;    /* 政治学 · 蓝 */
+    --economics: #10b981;   /* 经济学 · 绿 */
+    --philosophy: #8b5cf6;  /* 哲学 · 紫 */
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --bg: #f7f8fc;
+    --shadow: 0 1px 2px rgba(16,24,40,.05), 0 8px 24px rgba(16,24,40,.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  a { color: #2563eb; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ============ 顶部：标题 + 搜索栏 ============ */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 54px 24px 78px;
+    background: linear-gradient(120deg, #4f46e5, #6d5ce6 38%, #0ea5e9 70%, #10b981);
+    color: #fff;
+    text-align: center;
+  }
+  .hero::before, .hero::after {
+    content: ""; position: absolute; border-radius: 50%; filter: blur(70px); opacity: .35;
+  }
+  .hero::before { width: 300px; height: 300px; background: #c084fc; top: -120px; left: -50px; }
+  .hero::after  { width: 260px; height: 260px; background: #fbbf24; bottom: -120px; right: -40px; }
+
+  .hero-inner { position: relative; max-width: 780px; margin: 0 auto; }
+  .hero h1 { font-size: 40px; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 10px rgba(0,0,0,.15); }
+  .hero h1 .pp { color: #7dd3fc; }
+  .hero h1 .e  { color: #6ee7b7; }
+  .hero .subtitle { margin-top: 8px; font-size: 14px; opacity: .92; letter-spacing: .4px; }
+
+  .search-bar {
+    margin: 30px auto 0; max-width: 620px;
+    display: flex; align-items: center;
+    background: #fff; border-radius: 14px;
+    padding: 6px 6px 6px 18px;
+    box-shadow: 0 12px 34px rgba(0,0,0,.22);
+  }
+  .search-bar svg { flex-shrink: 0; opacity: .4; }
+  .search-bar input {
+    flex: 1; min-width: 0; border: none; outline: none;
+    font-size: 15px; padding: 12px 12px; background: transparent; color: var(--ink);
+  }
+  .search-bar input::placeholder { color: #9ca3af; }
+  .search-bar button {
+    flex-shrink: 0; border: none; cursor: pointer; padding: 11px 26px; border-radius: 10px;
+    font-size: 15px; font-weight: 700; color: #fff;
+    background: linear-gradient(120deg, #6d5ce6, #0ea5e9);
+    transition: transform .15s ease, filter .15s ease;
+  }
+  .search-bar button:hover { filter: brightness(1.08); }
+  .search-bar button:active { transform: scale(.97); }
+
+  .tabs {
+    margin: 18px auto 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+  }
+  .tabs button {
+    border: 1px solid rgba(255,255,255,.5); background: rgba(255,255,255,.14); color: #fff;
+    padding: 7px 18px; border-radius: 999px; cursor: pointer; font-size: 14px; font-weight: 600;
+    transition: all .15s ease; backdrop-filter: blur(4px);
+  }
+  .tabs button:hover { background: rgba(255,255,255,.3); }
+  .tabs button.active { background: #fff; color: #4338ca; box-shadow: 0 4px 14px rgba(0,0,0,.18); }
+
+  .chips {
+    margin-top: 14px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+    align-items: center; font-size: 13px; opacity: .92;
+  }
+  .chips button {
+    border: none; background: rgba(255,255,255,.16); color: #fff;
+    padding: 4px 12px; border-radius: 999px; cursor: pointer; font-size: 13px;
+    transition: background .15s ease;
+  }
+  .chips button:hover { background: rgba(255,255,255,.34); }
+
+  /* ============ 推荐区（热门文献 + 热点） ============ */
+  .sections { max-width: 1040px; margin: -30px auto 0; padding: 0 20px 30px; position: relative; }
+
+  .section {
+    background: #fff; border-radius: 18px; padding: 20px 22px 24px;
+    box-shadow: var(--shadow); margin-bottom: 22px;
+  }
+  .section-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+  .section-title { display: flex; align-items: center; gap: 10px; }
+  .section-title h2 { font-size: 20px; font-weight: 800; }
+  .badge {
+    font-size: 11px; color: #047857; background: #ecfdf5;
+    padding: 3px 10px; border-radius: 999px; font-weight: 700;
+  }
+  .sec-tabs { margin-left: auto; display: flex; gap: 6px; }
+  .sec-tabs button {
+    border: 1px solid #e5e7eb; background: #f9fafb; color: var(--muted);
+    padding: 5px 14px; border-radius: 999px; cursor: pointer; font-size: 13px;
+    transition: all .15s ease;
+  }
+  .sec-tabs button.active { background: #4338ca; border-color: transparent; color: #fff; font-weight: 600; }
+  .refresh {
+    border: none; background: #eef2ff; color: #4338ca; cursor: pointer;
+    padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    transition: all .15s ease;
+  }
+  .refresh:hover { background: #e0e7ff; }
+
+  .section-note { font-size: 12px; color: #9ca3af; margin-bottom: 14px; line-height: 1.7; }
+
+  .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .col { background: #fafbfe; border-radius: 14px; padding: 14px 16px; border: 1px solid #eef0f6; }
+  .col > h3 { font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+  .mini-card { background: #fff; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(16,24,40,.06); }
+  .mini-journal { font-size: 11px; font-weight: 700; color: #4338ca; margin-bottom: 3px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .mini-card h4 { font-size: 13px; font-weight: 600; line-height: 1.5; }
+  .mini-card h4 a { color: var(--ink); }
+  .mini-card h4 a:hover { color: #2563eb; text-decoration: none; }
+  .mini-meta { margin-top: 4px; font-size: 11.5px; color: var(--muted); }
+  .mini-tags { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .tag { font-size: 11px; padding: 1px 8px; border-radius: 999px; font-weight: 600; }
+  .tag-cites { background: #f5f3ff; color: #6d28d9; }
+  .tag-oa { background: #ecfdf5; color: #047857; }
+  .tag-core { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+  .tag-score { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+  .hot-filter { margin-bottom: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .hot-filter .hf-label { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .hf-chip {
+    border: 1px solid #e5e7eb; background: #fff; color: #4b5563;
+    padding: 4px 12px; border-radius: 999px; cursor: pointer; font-size: 12px;
+    transition: all .15s ease;
+  }
+  .hf-chip:hover { border-color: #a78bfa; color: #7c3aed; }
+  .hf-chip.active { background: #7c3aed; border-color: transparent; color: #fff; font-weight: 600; }
+
+  .news-list { list-style: none; }
+  .news-item { border-bottom: 1px dashed #e5e7eb; padding: 8px 0; }
+  .news-item:last-child { border-bottom: none; }
+  .news-item a { font-size: 13px; font-weight: 600; color: var(--ink); display: block; line-height: 1.5; }
+  .news-item a:hover { color: #2563eb; text-decoration: none; }
+  .news-meta { margin-top: 3px; font-size: 11px; color: #9ca3af; display: flex; gap: 8px; }
+  .news-src { color: #64748b; }
+
+  .col-loading { text-align: center; color: #9ca3af; font-size: 12px; padding: 20px 0; }
+  .col-error { text-align: center; color: #dc2626; font-size: 12px; padding: 16px 0; }
+  .spinner-sm {
+    width: 22px; height: 22px; margin: 0 auto 8px;
+    border: 3px solid rgba(67,56,202,.15); border-top-color: #6d5ce6;
+    border-radius: 50%; animation: spin .8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ============ 搜索结果 ============ */
+  .container { max-width: 880px; margin: 0 auto; padding: 0 20px 60px; }
+  .result-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #fff; border-radius: 14px; padding: 13px 18px;
+    box-shadow: var(--shadow); margin-bottom: 8px; flex-wrap: wrap; gap: 10px;
+  }
+  .result-bar .stat { font-size: 14px; color: var(--muted); }
+  .result-bar .stat b { color: #4338ca; font-size: 17px; margin: 0 3px; }
+  .bar-right { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+  .sort, .src-tabs { display: flex; gap: 6px; }
+  .sort button, .src-tabs button, .ft-box button {
+    border: 1px solid #e5e7eb; background: #f9fafb; color: var(--muted);
+    padding: 5px 13px; border-radius: 999px; cursor: pointer; font-size: 13px; transition: all .15s ease;
+  }
+  .sort button.active { background: #4338ca; border-color: transparent; color: #fff; font-weight: 600; }
+  .src-tabs button.active { background: #047857; border-color: transparent; color: #fff; font-weight: 600; }
+  .ft-box button.active { background: #7c3aed; border-color: transparent; color: #fff; font-weight: 600; }
+  .ft-box { max-width: 880px; margin: 0 auto 10px; padding: 0 20px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .ft-label { font-size: 12px; color: var(--muted); font-weight: 600; }
+
+  .hint { max-width: 880px; margin: 0 auto 18px; padding: 0 20px; font-size: 12px; color: #9ca3af; }
+
+  #results { display: flex; flex-direction: column; gap: 14px; }
+  .card {
+    display: flex; background: #fff; border-radius: 14px; overflow: hidden;
+    box-shadow: var(--shadow); transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(16,24,40,.06), 0 14px 34px rgba(16,24,40,.1); }
+  .card-accent { width: 5px; flex-shrink: 0; }
+  .card-body { padding: 16px 20px; flex: 1; min-width: 0; }
+  .card-top { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 7px; }
+  .card h3 { font-size: 16px; font-weight: 700; line-height: 1.5; }
+  .card h3 a { color: var(--ink); }
+  .card h3 a:hover { color: #2563eb; text-decoration: none; }
+  .card .authors { margin-top: 5px; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card .abstract {
+    margin-top: 8px; font-size: 13.5px; color: #4b5563;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .card-links { margin-top: 10px; display: flex; gap: 16px; font-size: 13px; }
+  .card-links a { display: inline-flex; align-items: center; gap: 3px; font-weight: 600; }
+
+  .loading { text-align: center; padding: 50px 0; color: var(--muted); font-size: 14px; }
+  .spinner {
+    width: 36px; height: 36px; margin: 0 auto 12px;
+    border: 4px solid rgba(67,56,202,.15); border-top-color: #6d5ce6;
+    border-radius: 50%; animation: spin .8s linear infinite;
+  }
+  .empty, .error {
+    text-align: center; background: #fff; border-radius: 14px; padding: 48px 20px;
+    box-shadow: var(--shadow); font-size: 15px; color: var(--muted);
+  }
+  .error { color: #b91c1c; }
+  .empty .big { font-size: 38px; display: block; margin-bottom: 8px; }
+  .btn-more {
+    display: block; margin: 24px auto 0; border: none; cursor: pointer; padding: 11px 38px;
+    border-radius: 999px; font-size: 14px; font-weight: 600; color: #4338ca; background: #fff;
+    box-shadow: var(--shadow); transition: all .15s ease;
+  }
+  .btn-more:hover { transform: translateY(-2px); background: #eef2ff; }
+
+  footer { text-align: center; padding: 26px 20px; font-size: 12px; color: #9ca3af; line-height: 1.9; }
+  footer a { color: #9ca3af; }
+  footer a:hover { color: #4338ca; }
+
+  @media (max-width: 800px) { .cols { grid-template-columns: 1fr; } }
+  @media (max-width: 600px) {
+    .hero { padding: 40px 16px 70px; }
+    .hero h1 { font-size: 30px; }
+    .search-bar { padding-left: 14px; }
+    .search-bar input { font-size: 14px; padding: 10px 8px; }
+    .search-bar button { padding: 10px 18px; font-size: 14px; }
+    .sec-tabs { margin-left: 0; }
+    .card-body { padding: 14px 16px; }
+    .result-bar { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <h1><span class="pp">P</span><span class="pp">P</span><span class="e">E</span> 专业文献查询</h1>
+    <p class="subtitle">Politics · Philosophy · Economics　政治学 · 哲学 · 经济学　多源学术检索</p>
+
+    <div class="search-bar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+      </svg>
+      <input id="query" type="text" placeholder="输入关键词，如 democracy、behavioral economics、ethics…"
+             autocomplete="off" spellcheck="false" />
+      <button id="btn-search">搜索</button>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <button data-discipline="" class="active">全部领域</button>
+      <button data-discipline="politics">政治学</button>
+      <button data-discipline="economics">经济学</button>
+      <button data-discipline="philosophy">哲学</button>
+    </div>
+
+    <div class="chips">
+      <span>热门检索：</span>
+      <button data-q="democracy">民主</button>
+      <button data-q="behavioral economics">行为经济学</button>
+      <button data-q="ethics">伦理学</button>
+      <button data-q="monetary policy">货币政策</button>
+      <button data-q="public choice">公共选择</button>
+    </div>
+  </div>
+</header>
+
+<!-- ============ 热门文献 ============ -->
+<div class="sections">
+  <section class="section" id="hot">
+    <div class="section-head">
+      <div class="section-title">
+        <h2>🔥 热门文献</h2>
+        <span class="badge">每日更新</span>
+      </div>
+      <div class="sec-tabs" id="hot-tabs">
+        <button data-region="int" class="active">国际文献</button>
+        <button data-region="cn">国内权威</button>
+        <button data-region="zh">中文文献</button>
+      </div>
+      <button class="refresh" data-sec="hot">刷新</button>
+    </div>
+    <div class="section-note" id="hot-note"></div>
+    <div class="hot-filter" id="hot-src-filter" style="display:none">
+      <span class="hf-label">来源</span>
+      <button class="hf-chip active" data-src="all">全部</button>
+      <button class="hf-chip" data-src="flagship">⭐ 旗舰期刊</button>
+      <button class="hf-chip" data-src="jstor">📚 JSTOR 经典</button>
+      <button class="hf-chip" data-src="sd">🔬 ScienceDirect</button>
+      <button class="hf-chip" data-src="diss">🎓 学位论文</button>
+    </div>
+    <div class="hot-filter" id="hot-filter" style="display:none">
+      <span class="hf-label">文献类型</span>
+      <button class="hf-chip active" data-f="全部">全部</button>
+      <button class="hf-chip" data-f="核心期刊">⭐ 核心期刊</button>
+      <button class="hf-chip" data-f="集刊文章">📚 集刊</button>
+      <button class="hf-chip" data-f="优先发布">🆕 优先发布</button>
+    </div>
+    <div class="hot-filter" id="hot-sf-int" style="display:none">
+      <span class="hf-label">推荐筛选</span>
+      <button class="hf-chip" data-core="1">⭐ 只看核心期刊</button>
+      <button class="hf-chip active" data-age="0">全部年份</button>
+      <button class="hf-chip" data-age="1">近1年</button>
+      <button class="hf-chip" data-age="3">近3年</button>
+      <button class="hf-chip" data-age="5">近5年</button>
+      <button class="hf-chip" data-cited="1">📈 仅高被引</button>
+    </div>
+    <div class="hot-filter" id="hot-sf-cn" style="display:none">
+      <span class="hf-label">推荐筛选</span>
+      <button class="hf-chip" data-core="1">⭐ 只看核心期刊</button>
+      <button class="hf-chip active" data-age="0">全部年份</button>
+      <button class="hf-chip" data-age="1">近1年</button>
+      <button class="hf-chip" data-age="3">近3年</button>
+      <button class="hf-chip" data-age="5">近5年</button>
+    </div>
+    <div class="cols" id="hot-cols">
+      <div class="col"><h3><span class="dot" style="background:var(--politics)"></span>政治学</h3><div class="col-body" id="hot-politics"></div></div>
+      <div class="col"><h3><span class="dot" style="background:var(--economics)"></span>经济学</h3><div class="col-body" id="hot-economics"></div></div>
+      <div class="col"><h3><span class="dot" style="background:var(--philosophy)"></span>哲学</h3><div class="col-body" id="hot-philosophy"></div></div>
+    </div>
+  </section>
+
+  <!-- ============ PPE 热点 ============ -->
+  <section class="section" id="news">
+    <div class="section-head">
+      <div class="section-title">
+        <h2>📰 政治 · 经济 · 哲学 热点</h2>
+        <span class="badge">每日更新</span>
+      </div>
+      <div class="sec-tabs" id="news-tabs">
+        <button data-region="zh" class="active">中文热点</button>
+        <button data-region="int">国际热点</button>
+      </div>
+      <button class="refresh" data-sec="news">刷新</button>
+    </div>
+    <div class="section-note" id="news-note"></div>
+    <div class="cols" id="news-cols">
+      <div class="col"><h3><span class="dot" style="background:var(--politics)"></span>政治学</h3><div class="col-body" id="news-politics"></div></div>
+      <div class="col"><h3><span class="dot" style="background:var(--economics)"></span>经济学</h3><div class="col-body" id="news-economics"></div></div>
+      <div class="col"><h3><span class="dot" style="background:var(--philosophy)"></span>哲学</h3><div class="col-body" id="news-philosophy"></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 搜索结果 ============ -->
+<main class="container" id="search-area">
+  <div class="result-bar" id="result-bar" hidden>
+    <div class="stat">共找到 <b id="count">0</b> 条相关文献</div>
+    <div class="bar-right">
+      <div class="src-tabs" id="source-tabs">
+        <button data-source="openalex" class="active">OpenAlex 综合</button>
+        <button data-source="crossref">Crossref 出版</button>
+        <button data-source="doaj">DOAJ 开放获取</button>
+      </div>
+      <div class="sort" id="sort-box">
+        <button id="sort-score" class="active">综合推荐</button>
+        <button id="sort-relevance">相关度</button>
+        <button id="sort-date">最新优先</button>
+      </div>
+    </div>
+    <div class="ft-box" id="ptype-box" hidden>
+      <span class="ft-label">文献类型</span>
+      <button data-ptype="all" class="active">全部</button>
+      <button data-ptype="journal">📄 期刊论文</button>
+      <button data-ptype="dissertation">🎓 学位论文</button>
+    </div>
+    <div class="ft-box" id="sf-filter" hidden>
+      <span class="ft-label">推荐筛选</span>
+      <button data-maxage="0" class="active">全部年份</button>
+      <button data-maxage="1">近1年</button>
+      <button data-maxage="3">近3年</button>
+      <button data-maxage="5">近5年</button>
+      <button data-mincited="1">📈 仅高被引</button>
+    </div>
+    </div>
+  </div>
+  <p class="hint" id="source-hint" hidden>注：Crossref / DOAJ 数据源暂不支持按学科过滤，已按关键词检索全部学科。</p>
+
+  <div id="results"></div>
+  <div id="loading" class="loading" hidden>
+    <div class="spinner"></div>正在检索学术数据库…
+  </div>
+  <div id="empty" class="empty" hidden><span class="big">🔍</span>没有找到相关文献，请尝试更换关键词。</div>
+  <div id="error" class="error" hidden>⚠️ 检索失败，请检查网络连接后重试。</div>
+  <button id="btn-more" class="btn-more" hidden>加载更多</button>
+</main>
+
+<footer>
+  数据源：<a href="https://openalex.org/" target="_blank" rel="noopener">OpenAlex</a>（国际综合，含 <a href="https://openalex.org/" target="_blank" rel="noopener">学位论文</a>） ·
+  <a href="https://www.crossref.org/" target="_blank" rel="noopener">Crossref</a>（出版商权威，含 <a href="https://www.jstor.org/" target="_blank" rel="noopener">JSTOR</a> 经典与 <a href="https://www.sciencedirect.com/" target="_blank" rel="noopener">ScienceDirect</a> 精选期刊） ·
+  <a href="https://doaj.org/" target="_blank" rel="noopener">DOAJ</a>（开放获取） ·
+  <a href="https://news.google.com/" target="_blank" rel="noopener">Google 新闻</a>（热点）<br>
+  学位论文来自 OpenAlex 收录的博硕士论文（含中文学位论文）· 知网 / 万方 / 维普未开放公开 API · 仅供科研学习参考<br>
+  推荐指数 = 引用速度 40% + 期刊权威 35% + 时效 25%（期刊权威基于期刊影响力与是否核心期刊，引用速度 = 被引次数/年）
+</footer>
+
+<script>
+'use strict';
+
+/* ============ 数据源配置 ============ */
+const OPENALEX = 'https://api.openalex.org/works';
+const CROSSREF = 'https://api.crossref.org';
+const DOAJ = 'https://doaj.org/api/search/articles';
+const RSS2JSON = 'https://api.rss2json.com/v1/api.json';
+const MAILTO = 'ppe-literature-search@example.com';
+
+const FIELDS = {
+  politics:  { name: '政治学', subfield: '3320', color: '#3b82f6', zhQuery: '政治 OR 政治学', enQuery: 'politics' },
+  economics: { name: '经济学', subfield: '2002', color: '#10b981', zhQuery: '经济 OR 经济学', enQuery: 'economics' },
+  philosophy:{ name: '哲学',   subfield: '1211', color: '#8b5cf6', zhQuery: '哲学 OR 伦理学', enQuery: 'philosophy' },
+};
+
+/* 各学科旗舰权威期刊（ISSN 已在 Crossref 验证） */
+const JOURNALS = {
+  politics: [
+    { issn: '0003-0554', name: 'American Political Science Review' },
+    { issn: '0092-5853', name: 'American Journal of Political Science' },
+    { issn: '0022-3816', name: 'The Journal of Politics' },
+    { issn: '0020-8183', name: 'International Organization' },
+  ],
+  economics: [
+    { issn: '0002-8282', name: 'American Economic Review' },
+    { issn: '0033-5533', name: 'The Quarterly Journal of Economics' },
+    { issn: '0012-9682', name: 'Econometrica' },
+    { issn: '0022-3808', name: 'Journal of Political Economy' },
+  ],
+  philosophy: [
+    { issn: '0022-362X', name: 'The Journal of Philosophy' },
+    { issn: '0048-3915', name: 'Philosophy & Public Affairs' },
+    { issn: '0014-1704', name: 'Ethics' },
+    { issn: '0031-8108', name: 'The Philosophical Review' },
+  ],
+};
+
+/* ScienceDirect（Elsevier）精选 PPE 期刊，ISSN 已核实 publisher=Elsevier */
+const SD_JOURNALS = {
+  politics: [
+    { issn: '0261-3794', name: 'Electoral Studies' },
+    { issn: '0176-2680', name: 'European Journal of Political Economy' },
+  ],
+  economics: [
+    { issn: '0047-2727', name: 'Journal of Public Economics' },
+    { issn: '0014-2921', name: 'European Economic Review' },
+    { issn: '0304-3932', name: 'Journal of Monetary Economics' },
+    { issn: '0304-3878', name: 'Journal of Development Economics' },
+    { issn: '0899-8256', name: 'Games and Economic Behavior' },
+  ],
+  philosophy: [
+    { issn: '0039-3681', name: 'Studies in History and Philosophy of Science' },
+  ],
+};
+
+/* JSTOR 经典：member:1121（学术出版社经典专著/章节），各学科检索词 */
+const JSTORE_QUERIES = {
+  politics: 'politics political science governance',
+  economics: 'economics economic',
+  philosophy: 'philosophy ethics metaphysics',
+};
+
+/* ============ 每日缓存（按日期，避免当天重复请求） ============ */
+const CACHE_KEY = 'ppe_daily_v2';
+function todayKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function readCache() { try { return JSON.parse(localStorage.getItem(CACHE_KEY) || '{}'); } catch (e) { return {}; } }
+function writeCache(c) { try { localStorage.setItem(CACHE_KEY, JSON.stringify(c)); } catch (e) {} }
+const cache = readCache();
+const TD = todayKey();
+if (!cache[TD]) cache[TD] = {};
+const secCache = cache[TD]; // { hotInt, hotZh, newsZh, newsInt }
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+/* ============ 综合推荐指数 ============ */
+/* 权重：引用速度 40% + 期刊权威 35% + 时效 25%（cited 缺失时重分配为 0.55/0.45） */
+const NOW_YEAR = new Date().getFullYear();
+const FLAG_NAMES = new Set(Object.values(JOURNALS).flatMap((arr) => arr.map((j) => j.name.toLowerCase())));
+const SD_NAMES = new Set(Object.values(SD_JOURNALS).flatMap((arr) => arr.map((j) => j.name.toLowerCase())));
+
+function paperScore(w) {
+  const year = Number(w.year != null ? w.year : w.publication_year) || 0;
+  const cited = Number(w.cited != null ? w.cited : w.cited_by_count) || 0;
+  let journal = w.journal || '';
+  if (!journal && w.primary_location && w.primary_location.source) journal = w.primary_location.source.display_name || '';
+  const type = w.type || '';
+  const jn = String(journal).toLowerCase();
+
+  const age = Math.max(0, NOW_YEAR - year);
+  const vel = cited / Math.max(1, age); // 被引/年
+  const velScore = Math.min(100, Math.round(vel * 6)); // ~17次/年 → 100
+  let venue;
+  if (w.core === true || (journal && FLAG_NAMES.has(jn))) venue = 100; // 旗舰期刊 / 核心期刊
+  else if (journal && SD_NAMES.has(jn)) venue = 90; // ScienceDirect 精选
+  else if (/学位|dissertation/i.test(type) || !journal || /^(学位论文|jstor)$/i.test(jn)) venue = 30; // 学位论文/无期刊名
+  else venue = 55; // 普通期刊
+  const rec = Math.max(10, 100 - age * 12); // 当年 100，每年 -12
+  const hasCited = cited > 0;
+  const wVel = hasCited ? 0.4 : 0.55;
+  const wVenue = hasCited ? 0.35 : 0.45;
+  const wRec = hasCited ? 0.25 : 0;
+  return Math.round(velScore * wVel + venue * wVenue + rec * wRec);
+}
+
+function scoreTag(score) {
+  return `<span class="tag tag-score">推荐 ${score}</span>`;
+}
+
+/* 过滤 + 按推荐指数降序（列表） */
+function applyPaperFilters(list, opts = {}) {
+  const coreOnly = !!opts.coreOnly;
+  const maxAge = opts.maxAge || 0;
+  const minCited = opts.minCited || 0;
+  return (list || []).filter((w) => {
+    const year = Number(w.year != null ? w.year : w.publication_year) || 0;
+    if (coreOnly) {
+      const jn = String(w.journal || '').toLowerCase();
+      const ok = w.core === true
+        || (w.journal && (FLAG_NAMES.has(jn) || SD_NAMES.has(jn)))
+        || w.type === '📄 期刊';
+      if (!ok) return false;
+    }
+    if (maxAge > 0 && year && NOW_YEAR - year > maxAge) return false;
+    if (minCited > 0 && (Number(w.cited != null ? w.cited : w.cited_by_count) || 0) < minCited) return false;
+    return true;
+  }).sort((a, b) => paperScore(b) - paperScore(a));
+}
+
+/* 过滤 + 排序（按学科分列的对象） */
+function applyHotFilters(data, opts) {
+  const out = {};
+  Object.keys(data || {}).forEach((k) => { out[k] = applyPaperFilters(data[k], opts); });
+  return out;
+}
+
+/* ============ 热门文献：国际（Crossref 权威期刊定向） ============ */
+function hotNote(region) {
+  if (region === 'cn') {
+    const d = window.NSSD_DATA;
+    const ts = (d && d.generated_at) ? (' · 数据抓取时间 ' + d.generated_at) : '';
+    return '国家哲学社会科学文献中心（中国社科院主办的国家级哲社文献平台，免费开放）最新文献。已按 NSSD 官方学科分类筛选，含核心期刊（CSSCI/核心）· 集刊 · 优先发布论文，⭐ 为核心期刊文献。由本地爬虫抓取生成' + ts + '。运行 python ppe_nssd_crawler.py 可更新。';
+  }
+  if (region === 'zh') {
+    return '中文文献来自 OpenAlex 收录的中文期刊（覆盖有限，不含知网/万方/维普），按被引次数推荐。';
+  }
+  const labels = {
+    all: '综合（旗舰期刊 + JSTOR 经典 + ScienceDirect）',
+    flagship: '各学科旗舰期刊（APSR / AJPS / JOP / IO · AER / QJE / Econometrica / JPE · J. Philosophy / P&amp;PA / Ethics / Phil. Review）',
+    jstor: 'JSTOR 学术出版社经典专著与章节（member:1121，按学科检索词）',
+    sd: 'ScienceDirect（Elsevier 精选期刊：JPubE / EER / JME / JDE / GEB / Electoral Studies / EJPE / SHPS）',
+    diss: '各学科近三年学位论文（博硕士论文，OpenAlex type:dissertation 收录，含中文学位论文）',
+  };
+  return '按被引次数推荐近三年高被引文献。当前来源：' + (labels[hotIntSource] || '') + '。JSTOR 与 ScienceDirect 无公开免密钥 API，经 Crossref 收录定向抓取。';
+}
+
+function issuedYear(it) {
+  const dp = it.issued && it.issued['date-parts'];
+  return (dp && dp[0] && dp[0][0]) || '';
+}
+
+function normalizeCrossrefItem(it) {
+  const links = it.link || [];
+  const oaL = links.find((l) => /pdf|html/i.test(l['content-type'] || '')) || links[0];
+  return {
+    id: '',
+    title: (it.title && it.title[0]) || '(无标题)',
+    year: issuedYear(it),
+    journal: (it['container-title'] && it['container-title'][0]) || '',
+    doi: it.DOI || '',
+    cited: it['is-referenced-by-count'] || 0,
+    oaUrl: (oaL && oaL.URL) || '',
+    type: it.type || '',
+  };
+}
+
+async function loadHotJournals(journalSet) {
+  const results = {};
+  await Promise.all(Object.keys(FIELDS).map(async (key) => {
+    const papers = [];
+    const set = journalSet[key] || [];
+    await Promise.all(set.map(async (j) => {
+      const url = `${CROSSREF}/journals/${j.issn}/works?rows=4&sort=is-referenced-by-count&order=desc&filter=from-pub-date:2023-01-01,type:journal-article&select=DOI,title,issued,container-title,is-referenced-by-count,link`;
+      const data = await fetch(url).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+      if (!data || !data.message) return;
+      (data.message.items || []).forEach((it) => {
+        const n = normalizeCrossrefItem(it);
+        n.journal = j.name; // 使用已核实的期刊名
+        papers.push(n);
+      });
+    }));
+    papers.sort((a, b) => b.cited - a.cited);
+    results[key] = papers.slice(0, 5);
+  }));
+  return results;
+}
+
+async function loadHotInt() { return loadHotJournals(JOURNALS); }
+async function loadHotSd() { return loadHotJournals(SD_JOURNALS); }
+
+async function loadHotJstor() {
+  const results = {};
+  await Promise.all(Object.keys(FIELDS).map(async (key) => {
+    const params = new URLSearchParams();
+    params.set('filter', 'member:1121,from-pub-date:2020-01-01');
+    params.set('query.bibliographic', JSTORE_QUERIES[key]);
+    params.set('rows', '8');
+    params.set('sort', 'is-referenced-by-count');
+    params.set('order', 'desc');
+    params.set('select', 'DOI,title,publisher,type,issued,is-referenced-by-count,link');
+    const data = await fetch(`${CROSSREF}/works?${params.toString()}`)
+      .then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    if (!data || !data.message) { results[key] = []; return; }
+    results[key] = (data.message.items || []).map((it) => {
+      const n = normalizeCrossrefItem(it);
+      if (!n.journal) n.journal = it.publisher || 'JSTOR'; // 专著无期刊名，回退出版社
+      n.type = (it.type === 'monograph' || it.type === 'book') ? '📖 专著'
+             : (it.type === 'book-chapter') ? '📚 章节' : (it.type === 'journal-article' ? '📄 期刊' : '');
+      return n;
+    });
+  }));
+  return results;
+}
+
+async function loadHotDiss() {
+  const results = {};
+  // 三学科请求错开，避免并发触发 OpenAlex 限流
+  const keys = Object.keys(FIELDS);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    if (i > 0) await new Promise((res) => setTimeout(res, 300));
+    const params = new URLSearchParams();
+    params.set('filter', `type:dissertation,primary_topic.subfield.id:${FIELDS[key].subfield},from_publication_date:2020-01-01`);
+    params.set('sort', 'cited_by_count:desc');
+    params.set('per-page', '6');
+    params.set('select', 'id,title,publication_year,authorships,primary_location,doi,cited_by_count');
+    params.set('mailto', MAILTO);
+    const data = await fetch(`${OPENALEX}?${params.toString()}`)
+      .then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    if (!data || !data.results) { results[key] = []; continue; }
+    results[key] = (data.results || [])
+      .filter((w) => w.title && w.title !== '(无标题)') // 过滤无标题的聚合条目
+      .map((w) => {
+        const n = normalizeWork(w);
+        if (!n.journal) n.journal = '学位论文';
+        n.type = '🎓 学位论文';
+        n.lang = w.language || '';
+        return n;
+      });
+  }
+  return results;
+}
+
+async function loadHotAll() {
+  const [f, j, s, d] = await Promise.all([loadHotInt(), loadHotJstor(), loadHotSd(), loadHotDiss()]);
+  const results = {};
+  Object.keys(FIELDS).forEach((key) => {
+    const groups = [f[key] || [], j[key] || [], s[key] || [], d[key] || []];
+    results[key] = interleaveGroups(groups).slice(0, 8);
+  });
+  return results;
+}
+
+/* 多组按序交错合并，让不同来源均衡展示 */
+function interleaveGroups(groups) {
+  const out = [];
+  for (let i = 0; i < Math.max(...groups.map((g) => g.length)); i++) {
+    for (const g of groups) if (g[i]) out.push(g[i]);
+  }
+  return out;
+}
+
+/* ============ 热门文献：中文（OpenAlex 学科细分 + zh） ============ */
+function normalizeWork(w) {
+  const src = (w.primary_location && w.primary_location.source) || {};
+  return {
+    id: (w.id || '').split('/').pop(),
+    title: w.title || '(无标题)',
+    year: w.publication_year || '',
+    journal: src.display_name || '',
+    doi: w.doi ? w.doi.replace('https://doi.org/', '') : '',
+    cited: w.cited_by_count || 0,
+    oaUrl: (w.open_access && w.open_access.oa_url) || '',
+  };
+}
+
+async function loadHotZh() {
+  const results = {};
+  await Promise.all(Object.keys(FIELDS).map(async (key) => {
+    const params = new URLSearchParams();
+    params.set('filter', `primary_topic.subfield.id:${FIELDS[key].subfield},type:article,language:zh,from_publication_date:2020-01-01`);
+    params.set('sort', 'cited_by_count:desc');
+    params.set('per-page', '5');
+    params.set('select', 'id,title,publication_year,primary_location,open_access,doi,cited_by_count');
+    params.set('mailto', MAILTO);
+    const data = await fetch(OPENALEX + '?' + params.toString()).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+    results[key] = ((data && data.results) || []).map(normalizeWork);
+  }));
+  return results;
+}
+
+function renderHotColumns(data) {
+  Object.entries(FIELDS).forEach(([key]) => {
+    const box = $('hot-' + key);
+    const list = data[key] || [];
+    if (!list.length) { box.innerHTML = '<div class="col-error">暂无数据</div>'; return; }
+    box.innerHTML = list.map((w) => `
+      <article class="mini-card">
+        ${w.journal ? `<div class="mini-journal">📌 ${esc(w.journal)}</div>` : ''}
+        <h4><a href="${w.doi ? 'https://doi.org/' + esc(w.doi) : 'https://openalex.org/' + w.id}" target="_blank" rel="noopener">${esc(w.title)}</a></h4>
+        <div class="mini-meta">${w.year}${w.cited ? ' · 被引 ' + w.cited : ''}</div>
+        <div class="mini-tags">
+          ${scoreTag(paperScore(w))}
+          ${w.type ? `<span class="tag" style="background:#fdf4ff;color:#a21caf">${esc(w.type)}</span>` : ''}
+          ${w.oaUrl ? '<span class="tag tag-oa">OA</span>' : ''}
+          ${w.doi ? `<a class="tag" style="background:#eff6ff;color:#2563eb" href="https://doi.org/${esc(w.doi)}" target="_blank" rel="noopener">DOI ↗</a>` : ''}
+        </div>
+      </article>`).join('');
+  });
+}
+
+/* ============ 热门文献：国内权威（本地 NSSD 爬虫数据） ============ */
+/* 数据来源：nssd_data.js（由 ppe_nssd_crawler.py 生成，<script> 加载，file:// 下可用） */
+async function loadHotCn() {
+  const d = window.NSSD_DATA;
+  if (!d || !d.disciplines) throw new Error('未找到国内权威数据，请先运行 python ppe_nssd_crawler.py');
+  const nameMap = { politics: '政治学', economics: '经济学', philosophy: '哲学' };
+  const results = {};
+  Object.entries(nameMap).forEach(([key, cn]) => {
+    const papers = d.disciplines[cn] || [];
+    // 按文献类型流分组后交错合并：让"全部"视图均衡展示核心/集刊/优先发布
+    const groups = {};
+    papers.forEach((p) => { (groups[p.stream || '其他'] = groups[p.stream || '其他'] || []).push(p); });
+    const names = Object.keys(groups);
+    const mixed = [];
+    for (let i = 0; i < papers.length; i++) {
+      let added = false;
+      for (const n of names) {
+        if (groups[n][i]) { mixed.push(groups[n][i]); added = true; }
+      }
+      if (!added) break;
+    }
+    results[key] = mixed.slice(0, 24);
+  });
+  return results;
+}
+
+function renderNssdColumns(data, filter) {
+  const f = filter || '全部';
+  const nameMap = { politics: '政治学', economics: '经济学', philosophy: '哲学' };
+  Object.entries(nameMap).forEach(([key, cnName]) => {
+    const box = $('hot-' + key);
+    let list = (data[key] || []).slice();
+    if (f !== '全部') list = list.filter((w) => (w.stream || w.type) === f);
+    if (!list.length) {
+      box.innerHTML = `<div class="col-error">暂无${f === '全部' ? '' : '「' + esc(f) + '」'}文献</div>`;
+      return;
+    }
+    box.innerHTML = list.slice(0, 8).map((w) => `
+      <article class="mini-card">
+        ${w.journal ? `<div class="mini-journal">📌 ${esc(w.journal)}</div>` : ''}
+        <h4><a href="${esc(w.link || '#')}" target="_blank" rel="noopener">${esc(w.title)}</a></h4>
+        <div class="mini-meta">${w.year}${w.authors && w.authors.length ? ' · ' + esc(w.authors.slice(0, 3).join('、')) : ''}</div>
+        <div class="mini-tags">
+          ${scoreTag(paperScore(w))}
+          ${w.core ? '<span class="tag tag-core">⭐ 核心期刊</span>' : ''}
+          ${w.stream && w.stream !== '核心期刊' ? `<span class="tag" style="background:#fdf4ff;color:#a21caf">${esc(w.stream)}</span>` : ''}
+          ${w.type && w.type !== '中文期刊文章' ? `<span class="tag" style="background:#ecfdf5;color:#047857">${esc(w.type)}</span>` : ''}
+          <span class="tag" style="background:#eef2ff;color:#4338ca">国家权威</span>
+        </div>
+      </article>`).join('');
+  });
+}
+
+/* ============ PPE 热点：新闻 ============ */
+function newsNote(region) {
+  if (region === 'zh') return '聚合自 Google 新闻中文源（新华社、澎湃、中国日报、每日经济新闻等）当天及近两天要闻。';
+  return 'Aggregated from Google News global sources (BBC, Reuters, The Guardian…).';
+}
+
+async function loadNews(region) {
+  const results = {};
+  await Promise.all(Object.keys(FIELDS).map(async (f) => {
+    const kw = region === 'zh' ? FIELDS[f].zhQuery : FIELDS[f].enQuery;
+    const gn = region === 'zh'
+      ? `https://news.google.com/rss/search?q=${encodeURIComponent(kw)}&hl=zh-CN&gl=CN&ceid=CN:zh-Hans`
+      : `https://news.google.com/rss/search?q=${encodeURIComponent(kw)}&hl=en-US&gl=US&ceid=US:en`;
+    const data = await fetch(`${RSS2JSON}?rss_url=${encodeURIComponent(gn)}`).then((r) => r.json()).catch(() => ({ items: [] }));
+    results[f] = (data.items || []).map((n) => ({
+      title: n.title || '',
+      link: n.link || '#',
+      source: n.source || n.author || '',
+      date: shortDate(n.pubDate),
+    }));
+  }));
+  return results;
+}
+
+function shortDate(s) {
+  const m = String(s || '').match(/\d{4}-(\d{2})-(\d{2})/);
+  return m ? m[1] + '-' + m[2] : '';
+}
+
+function renderNewsColumns(data) {
+  Object.entries(FIELDS).forEach(([key]) => {
+    const box = $('news-' + key);
+    const list = data[key] || [];
+    if (!list.length) { box.innerHTML = '<div class="col-error">暂无数据</div>'; return; }
+    box.innerHTML = '<ul class="news-list">' + list.slice(0, 6).map((n) => `
+      <li class="news-item">
+        <a href="${esc(n.link)}" target="_blank" rel="noopener">${esc(n.title)}</a>
+        <div class="news-meta">
+          ${n.source ? `<span class="news-src">${esc(n.source)}</span>` : ''}
+          ${n.date ? `<span>${esc(n.date)}</span>` : ''}
+        </div>
+      </li>`).join('') + '</ul>';
+  });
+}
+
+/* ============ 区块调度（缓存 + 并行加载） ============ */
+const COL_IDS = { hot: ['hot-politics', 'hot-economics', 'hot-philosophy'], news: ['news-politics', 'news-economics', 'news-philosophy'] };
+
+function loadSection(section, cacheKey, loader, renderer, region) {
+  if (secCache[cacheKey]) { renderer(secCache[cacheKey], region); return; }
+  COL_IDS[section].forEach((id) => { $(id).innerHTML = '<div class="col-loading"><div class="spinner-sm"></div>加载中…</div>'; });
+  loader(region).then((data) => {
+    secCache[cacheKey] = data;
+    writeCache(cache);
+    renderer(data, region);
+  }).catch((err) => {
+    console.error(err);
+    COL_IDS[section].forEach((id) => { $(id).innerHTML = '<div class="col-error">加载失败，可点击右上角「刷新」重试</div>'; });
+  });
+}
+
+const HOT_REGIONS = { int: 'hotInt', zh: 'hotZh', cn: 'hotCn' };
+const NEWS_REGIONS = { zh: 'newsZh', int: 'newsInt' };
+const HOT_LOADER = { int: loadHotInt, zh: loadHotZh, cn: loadHotCn };
+const HOT_RENDERER = { int: renderHotColumns, zh: renderHotColumns, cn: renderNssdColumns };
+
+let hotCnFilter = '全部'; // 国内权威文献类型筛选（全部/核心期刊/集刊文章/优先发布）
+let hotIntSource = 'all'; // 国际文献来源筛选（all/flagship/jstor/sd）
+let hotIntCore = false, hotIntMaxAge = 0, hotIntMinCited = 0; // 国际推荐筛选状态
+let hotCnCore = false, hotCnMaxAge = 0; // 国内推荐筛选状态
+const HOT_INT_SOURCES = { all: loadHotAll, flagship: loadHotInt, jstor: loadHotJstor, sd: loadHotSd, diss: loadHotDiss };
+const hotIntOpts = () => ({ coreOnly: hotIntCore, maxAge: hotIntMaxAge, minCited: hotIntMinCited });
+const hotCnOpts = () => ({ coreOnly: hotCnCore, maxAge: hotCnMaxAge, minCited: 0 });
+
+function activateHot(region) {
+  $('hot-note').textContent = hotNote(region);
+  document.querySelectorAll('#hot-tabs button').forEach((b) => b.classList.toggle('active', b.dataset.region === region));
+  const typeFlt = $('hot-filter');
+  const srcFlt = $('hot-src-filter');
+  if (srcFlt) srcFlt.style.display = region === 'int' ? '' : 'none';
+  if (typeFlt) typeFlt.style.display = region === 'cn' ? '' : 'none';
+  $('hot-sf-int').style.display = region === 'int' ? '' : 'none';
+  $('hot-sf-cn').style.display = region === 'cn' ? '' : 'none';
+  if (region === 'int') { activateHotInt(hotIntSource); return; }
+  const renderer = region === 'cn'
+    ? (data) => renderNssdColumns(applyHotFilters(data, hotCnOpts()), hotCnFilter)
+    : renderHotColumns;
+  loadSection('hot', HOT_REGIONS[region], HOT_LOADER[region], renderer, region);
+}
+
+function activateHotInt(source) {
+  const bucket = secCache['hotInt'] || (secCache['hotInt'] = {});
+  const render = (data) => renderHotColumns(applyHotFilters(data, hotIntOpts()));
+  if (bucket[source]) { render(bucket[source]); return; }
+  COL_IDS.hot.forEach((id) => { $(id).innerHTML = '<div class="col-loading"><div class="spinner-sm"></div>加载中…</div>'; });
+  HOT_INT_SOURCES[source]().then((data) => {
+    bucket[source] = data;
+    writeCache(cache);
+    render(data);
+  }).catch(() => {
+    COL_IDS.hot.forEach((id) => { $(id).innerHTML = '<div class="col-error">加载失败，可点击右上角「刷新」重试</div>'; });
+  });
+}
+
+function activateNews(region) {
+  $('news-note').textContent = newsNote(region);
+  document.querySelectorAll('#news-tabs button').forEach((b) => b.classList.toggle('active', b.dataset.region === region));
+  loadSection('news', NEWS_REGIONS[region], loadNews, renderNewsColumns, region);
+}
+
+/* ============ 搜索（多数据源） ============ */
+const state = { query: '', discipline: '', sort: 'score', source: 'openalex', ptype: 'all', page: 1, perPage: 10, total: 0, loading: false, maxAge: 0, minCited: 0 };
+/* 文献类型过滤：all=全部 / journal=期刊论文 / dissertation=学位论文 */
+const DISCIPLINES = {
+  politics:  { id: 'C17744445', name: '政治学', color: '#3b82f6' },
+  economics: { id: 'C162324750', name: '经济学', color: '#10b981' },
+  philosophy:{ id: 'C138885662', name: '哲学',   color: '#8b5cf6' },
+};
+
+function buildOpenAlexUrl() {
+  const params = new URLSearchParams();
+  params.set('search', state.query);
+  params.set('per-page', state.perPage);
+  params.set('page', state.page);
+  params.set('select', 'id,title,publication_year,type,authorships,primary_location,open_access,doi,cited_by_count,abstract_inverted_index,concepts');
+  params.set('mailto', MAILTO);
+  const flt = [];
+  if (state.discipline) flt.push(`primary_topic.subfield.id:${FIELDS[state.discipline].subfield}`);
+  if (state.ptype === 'dissertation') flt.push('type:dissertation');
+  if (state.maxAge > 0) flt.push(`from_publication_date:${NOW_YEAR - state.maxAge}-01-01`);
+  if (flt.length) params.set('filter', flt.join(','));
+  if (state.sort === 'pub_date') params.set('sort', 'publication_date:desc');
+  return `${OPENALEX}?${params.toString()}`;
+}
+
+function buildCrossrefUrl() {
+  const params = new URLSearchParams();
+  params.set('query.bibliographic', state.query);
+  params.set('rows', state.perPage);
+  params.set('offset', (state.page - 1) * state.perPage);
+  params.set('select', 'DOI,title,author,issued,container-title,is-referenced-by-count,publisher,link,type');
+  let typeF = state.ptype === 'dissertation' ? 'type:dissertation' : 'type:journal-article';
+  if (state.maxAge > 0) typeF += `,from-pub-date:${NOW_YEAR - state.maxAge}-01-01`;
+  params.set('filter', typeF);
+  if (state.sort === 'pub_date') { params.set('sort', 'published'); params.set('order', 'desc'); }
+  return `${CROSSREF}/works?${params.toString()}`;
+}
+
+function buildDoajUrl() {
+  return `${DOAJ}/${encodeURIComponent(state.query)}?size=${state.perPage}&page=${state.page}`;
+}
+
+async function fetchPageOpenAlex() {
+  const res = await fetch(buildOpenAlexUrl());
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  let works = data.results || [];
+  state.total = data.meta ? data.meta.count : 0;
+  if (state.sort === 'score') works = works.slice().sort((a, b) => paperScore(b) - paperScore(a));
+  if (state.minCited > 0) works = works.filter((w) => (w.cited_by_count || 0) >= state.minCited);
+  renderOpenAlexCards(works);
+}
+
+async function fetchPageCrossref() {
+  const res = await fetch(buildCrossrefUrl());
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  let items = (data.message.items || []).map(normalizeCrossrefItem);
+  state.total = data.message['total-results'] || 0;
+  if (state.sort === 'score') items = items.sort((a, b) => paperScore(b) - paperScore(a));
+  if (state.minCited > 0) items = items.filter((it) => (it.cited || 0) >= state.minCited);
+  renderSimpleCards(items);
+}
+
+async function fetchPageDoaj() {
+  const res = await fetch(buildDoajUrl());
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = await res.json();
+  const items = data.results || [];
+  state.total = data.total || 0;
+  renderSimpleCards(items.map((r) => normalizeDoaj(r.bibjson || {})));
+}
+
+async function fetchPage() {
+  if (state.loading) return;
+  state.loading = true; $('loading').hidden = false;
+  try {
+    if (state.source === 'openalex') await fetchPageOpenAlex();
+    else if (state.source === 'crossref') await fetchPageCrossref();
+    else await fetchPageDoaj();
+
+    $('result-bar').hidden = false;
+    $('count').textContent = state.total.toLocaleString();
+    $('btn-more').hidden = state.page * state.perPage >= state.total || state.total === 0;
+    if (state.page === 1 && state.total === 0) $('empty').hidden = false;
+  } catch (err) {
+    console.error(err); $('error').hidden = false;
+  } finally {
+    state.loading = false; $('loading').hidden = true;
+  }
+}
+
+/* ============ 渲染：OpenAlex 结果 ============ */
+function fieldOf(concepts) {
+  if (!Array.isArray(concepts)) return null;
+  for (const [key, d] of Object.entries(DISCIPLINES)) {
+    if (concepts.some((c) => c.id === 'https://openalex.org/' + d.id)) return d;
+  }
+  return null;
+}
+
+function renderOpenAlexCards(works) {
+  const box = $('results');
+  works.forEach((w) => {
+    const field = fieldOf(w.concepts);
+    const source = (w.primary_location && w.primary_location.source) || {};
+    const journal = source.display_name || '';
+    const doi = w.doi ? w.doi.replace('https://doi.org/', '') : '';
+    const oa = w.open_access && (w.open_access.is_oa || w.open_access.oa_url);
+    const authors = (w.authorships || []).slice(0, 8).map((a) => a.author && a.author.display_name).filter(Boolean).join(', ');
+    const abstract = reconstructAbstract(w.abstract_inverted_index);
+    box.insertAdjacentHTML('beforeend', `
+      <article class="card">
+        <div class="card-accent" style="background:${field ? field.color : '#64748b'}"></div>
+        <div class="card-body">
+          <div class="card-top">
+            ${scoreTag(paperScore(w))}
+            ${field ? `<span class="tag" style="background:${field.color}1a;color:${field.color}">${field.name}</span>` : ''}
+            ${w.publication_year ? `<span class="tag" style="background:#fffbeb;color:#b45309">${w.publication_year}</span>` : ''}
+            ${journal ? `<span class="tag" style="background:#eff6ff;color:#2563eb">${esc(journal)}</span>` : ''}
+            ${oa ? '<span class="tag" style="background:#ecfdf5;color:#047857">开放获取</span>' : ''}
+            ${w.cited_by_count ? `<span class="tag" style="background:#f5f3ff;color:#6d28d9">被引 ${w.cited_by_count}</span>` : ''}
+          </div>
+          <h3><a href="https://openalex.org/${(w.id || '').split('/').pop()}" target="_blank" rel="noopener">${esc(w.title || '(无标题)')}</a></h3>
+          ${authors ? `<p class="authors">${esc(authors)}</p>` : ''}
+          ${abstract ? `<p class="abstract">${esc(abstract)}</p>` : ''}
+          <div class="card-links">
+            <a href="https://openalex.org/${(w.id || '').split('/').pop()}" target="_blank" rel="noopener">OpenAlex 详情 ↗</a>
+            ${doi ? `<a href="https://doi.org/${esc(doi)}" target="_blank" rel="noopener">DOI ↗</a>` : ''}
+            ${oa && w.open_access.oa_url ? `<a href="${esc(w.open_access.oa_url)}" target="_blank" rel="noopener">全文 ↗</a>` : ''}
+          </div>
+        </div>
+      </article>`);
+  });
+}
+
+/* ============ 渲染：Crossref / DOAJ 结果 ============ */
+function normalizeDoaj(b) {
+  const t = b.title;
+  const title = typeof t === 'string' ? t : (Array.isArray(t) && t[0]) || '(无标题)';
+  const doi = (b.identifier || []).find((i) => i.type === 'doi');
+  const links = b.link || [];
+  const oaUrl = (links[0] && links[0].url) || '';
+  return {
+    id: '',
+    title,
+    year: b.year || '',
+    journal: (b.journal && b.journal.title) || '',
+    doi: doi ? doi.id : '',
+    cited: 0,
+    oaUrl,
+    authors: (b.author || []).slice(0, 6).map((a) => a.name).filter(Boolean).join(', '),
+  };
+}
+
+function renderSimpleCards(list) {
+  const box = $('results');
+  list.forEach((it) => {
+    const detailUrl = it.doi ? 'https://doi.org/' + esc(it.doi) : (it.oaUrl || '#');
+    box.insertAdjacentHTML('beforeend', `
+      <article class="card">
+        <div class="card-accent" style="background:#4338ca"></div>
+        <div class="card-body">
+          <div class="card-top">
+            ${scoreTag(paperScore(it))}
+            ${it.journal ? `<span class="tag" style="background:#eff6ff;color:#2563eb">${esc(it.journal)}</span>` : ''}
+            ${it.year ? `<span class="tag" style="background:#fffbeb;color:#b45309">${it.year}</span>` : ''}
+            ${it.cited ? `<span class="tag" style="background:#f5f3ff;color:#6d28d9">被引 ${it.cited}</span>` : ''}
+            ${it.oaUrl ? '<span class="tag" style="background:#ecfdf5;color:#047857">开放获取</span>' : ''}
+          </div>
+          <h3><a href="${detailUrl}" target="_blank" rel="noopener">${esc(it.title)}</a></h3>
+          ${it.authors ? `<p class="authors">${esc(it.authors)}</p>` : ''}
+          <div class="card-links">
+            ${it.doi ? `<a href="https://doi.org/${esc(it.doi)}" target="_blank" rel="noopener">DOI ↗</a>` : ''}
+            ${it.oaUrl ? `<a href="${esc(it.oaUrl)}" target="_blank" rel="noopener">开放获取全文 ↗</a>` : ''}
+          </div>
+        </div>
+      </article>`);
+  });
+}
+
+function reconstructAbstract(inverted) {
+  if (!inverted) return '';
+  const words = [];
+  for (const [word, positions] of Object.entries(inverted)) for (const pos of positions) words[pos] = word;
+  return words.join(' ').trim();
+}
+
+/* ============ 搜索控制 ============ */
+async function runSearch() {
+  const q = $('query').value.trim();
+  if (!q || state.loading) return;
+  state.query = q; state.page = 1;
+  $('results').innerHTML = ''; $('empty').hidden = true; $('error').hidden = true;
+  $('btn-more').hidden = true; $('result-bar').hidden = true;
+  $('ptype-box').hidden = false;
+  $('ptype-box').style.display = (state.source === 'doaj') ? 'none' : '';
+  $('sf-filter').hidden = false;
+  $('sf-filter').style.display = (state.source === 'doaj') ? 'none' : '';
+  await fetchPage();
+  $('search-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function setSort(s) {
+  if (state.sort === s || !state.query) return;
+  state.sort = s;
+  $('sort-score').classList.toggle('active', s === 'score');
+  $('sort-relevance').classList.toggle('active', s === 'relevance');
+  $('sort-date').classList.toggle('active', s === 'pub_date');
+  state.page = 1; $('results').innerHTML = '';
+  await fetchPage();
+}
+
+function setPtype(p) {
+  if (state.ptype === p || !state.query) return;
+  state.ptype = p;
+  document.querySelectorAll('#ptype-box button').forEach((b) => b.classList.toggle('active', b.dataset.ptype === p));
+  state.page = 1; $('results').innerHTML = '';
+  $('empty').hidden = true; $('error').hidden = true; $('btn-more').hidden = true;
+  fetchPage();
+}
+
+function setSource(s) {
+  if (state.source === s) return;
+  state.source = s;
+  document.querySelectorAll('#source-tabs button').forEach((b) => b.classList.toggle('active', b.dataset.source === s));
+  $('sort-box').style.display = (s === 'doaj') ? 'none' : '';
+  $('ptype-box').style.display = (s === 'doaj') ? 'none' : '';
+  $('sf-filter').style.display = (s === 'doaj') ? 'none' : '';
+  $('source-hint').hidden = !(state.discipline && s !== 'openalex');
+  if (state.query) {
+    state.page = 1; $('results').innerHTML = '';
+    $('empty').hidden = true; $('error').hidden = true;
+    $('btn-more').hidden = true; $('result-bar').hidden = true;
+    fetchPage();
+  }
+}
+
+async function loadMore() { if (!state.loading) { state.page += 1; await fetchPage(); } }
+
+/* ============ 初始化 ============ */
+function init() {
+  $('btn-search').addEventListener('click', runSearch);
+  $('query').addEventListener('keydown', (e) => { if (e.key === 'Enter') runSearch(); });
+  $('btn-more').addEventListener('click', loadMore);
+  $('sort-score').addEventListener('click', () => setSort('score'));
+  $('sort-relevance').addEventListener('click', () => setSort('relevance'));
+  $('sort-date').addEventListener('click', () => setSort('pub_date'));
+  $('sf-filter').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn || !state.query) return;
+    if (btn.dataset.maxage !== undefined) {
+      state.maxAge = Number(btn.dataset.maxage);
+      document.querySelectorAll('#sf-filter [data-maxage]').forEach((b) => b.classList.toggle('active', b === btn));
+    } else if (btn.dataset.mincited !== undefined) {
+      const on = btn.classList.contains('active');
+      state.minCited = on ? 0 : 30;
+      btn.classList.toggle('active', !on);
+    } else return;
+    state.page = 1; $('results').innerHTML = '';
+    $('empty').hidden = true; $('error').hidden = true; $('btn-more').hidden = true;
+    fetchPage();
+  });
+  $('source-tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-source]');
+    if (btn) setSource(btn.dataset.source);
+  });
+  $('ptype-box').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-ptype]');
+    if (btn) setPtype(btn.dataset.ptype);
+  });
+
+  $('tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-discipline]');
+    if (!btn) return;
+    document.querySelectorAll('#tabs button').forEach((b) => b.classList.toggle('active', b === btn));
+    state.discipline = btn.dataset.discipline;
+    $('source-hint').hidden = !(state.discipline && state.source !== 'openalex');
+    if (state.query) runSearch();
+  });
+
+  document.querySelectorAll('.chips button').forEach((btn) => {
+    btn.addEventListener('click', () => { $('query').value = btn.dataset.q; runSearch(); });
+  });
+
+  $('hot-tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-region]');
+    if (btn) activateHot(btn.dataset.region);
+  });
+  $('hot-filter').addEventListener('click', (e) => {
+    const btn = e.target.closest('.hf-chip');
+    if (!btn) return;
+    hotCnFilter = btn.dataset.f;
+    document.querySelectorAll('#hot-filter .hf-chip').forEach((b) => b.classList.toggle('active', b === btn));
+    if (secCache['hotCn']) renderNssdColumns(applyHotFilters(secCache['hotCn'], hotCnOpts()), hotCnFilter);
+  });
+  $('hot-sf-int').addEventListener('click', (e) => {
+    const chip = e.target.closest('.hf-chip');
+    if (!chip) return;
+    if (chip.dataset.age !== undefined) {
+      hotIntMaxAge = Number(chip.dataset.age);
+      document.querySelectorAll('#hot-sf-int [data-age]').forEach((b) => b.classList.toggle('active', b === chip));
+    } else if (chip.dataset.core !== undefined) {
+      hotIntCore = !chip.classList.contains('active');
+      chip.classList.toggle('active', hotIntCore);
+    } else if (chip.dataset.cited !== undefined) {
+      const wasOn = chip.classList.contains('active');
+      hotIntMinCited = wasOn ? 0 : 30;
+      chip.classList.toggle('active', !wasOn);
+    } else return;
+    const src = secCache['hotInt'] || {};
+    if (src[hotIntSource]) renderHotColumns(applyHotFilters(src[hotIntSource], hotIntOpts()));
+  });
+  $('hot-sf-cn').addEventListener('click', (e) => {
+    const chip = e.target.closest('.hf-chip');
+    if (!chip) return;
+    if (chip.dataset.age !== undefined) {
+      hotCnMaxAge = Number(chip.dataset.age);
+      document.querySelectorAll('#hot-sf-cn [data-age]').forEach((b) => b.classList.toggle('active', b === chip));
+    } else if (chip.dataset.core !== undefined) {
+      hotCnCore = !chip.classList.contains('active');
+      chip.classList.toggle('active', hotCnCore);
+    } else return;
+    if (secCache['hotCn']) renderNssdColumns(applyHotFilters(secCache['hotCn'], hotCnOpts()), hotCnFilter);
+  });
+  $('hot-src-filter').addEventListener('click', (e) => {
+    const btn = e.target.closest('.hf-chip');
+    if (!btn) return;
+    hotIntSource = btn.dataset.src;
+    document.querySelectorAll('#hot-src-filter .hf-chip').forEach((b) => b.classList.toggle('active', b === btn));
+    $('hot-note').textContent = hotNote('int');
+    activateHotInt(hotIntSource);
+  });
+  $('news-tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-region]');
+    if (btn) activateNews(btn.dataset.region);
+  });
+
+  document.querySelectorAll('.refresh').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const sec = btn.dataset.sec;
+      const activeHot = document.querySelector('#hot-tabs button.active').dataset.region;
+      const activeNews = document.querySelector('#news-tabs button.active').dataset.region;
+      if (sec === 'hot') {
+        delete secCache[HOT_REGIONS[activeHot]]; writeCache(cache);
+        activateHot(activeHot);
+      } else {
+        delete secCache[NEWS_REGIONS[activeNews]]; writeCache(cache);
+        activateNews(activeNews);
+      }
+    });
+  });
+
+  activateHot('int');
+  activateNews('zh');
+}
+
+init();
+</script>
+<!-- 国内权威文献数据（由 ppe_nssd_crawler.py 生成） -->
+<script src="nssd_data.js"></script>
+</body>
+</html>
