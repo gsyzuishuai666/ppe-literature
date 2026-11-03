@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-02 12:28:00",
+  "generated_at": "2026-11-03 12:36:17",
   "source": "国家哲学社会科学文献中心 (https://www.ncpssd.cn/)",
   "note": "中国社科院主办的国家级哲学社会科学文献平台，免费开放。已按 NSSD 官方学科分类筛选，含核心期刊 / 集刊 / 优先发布文献。",
   "disciplines": {
@@ -2099,54 +2099,55 @@
         "source": "国家哲学社会科学文献中心"
       },
       {
-        "title": "皮尔士和杜威对探究的不同阐释——认识论到生存论的转变",
-        "title_en": "Different Interpretations of Inquiry by Peirce and Dewey: Transition from Epistemology to Existentialism",
+        "title": "中国美学现代转型的三个面向——以康德美学为中心",
+        "title_en": "Three Dimensions of the Modern Transformation of Chinese Aesthetics: Centered on Kantian Aesthetics",
         "authors": [
-          "董明"
+          "李志雄",
+          "雷凯龙"
         ],
-        "journal": "红河学院学报",
+        "journal": "廊坊师范学院学报：社会科学版",
         "year": "2026",
-        "abstract": "皮尔士和杜威都对探究概念进行过阐释。皮尔士从认识论角度出发，把探究看作是信念从不确定状态到确定状态的转变过程。然而这种观点存在局限性，如对实在的预设可能导致探究活动脱离实际情境，且实在作为真理的评价标准存在歧义。杜威则强调探究是有机体与环境互动的必然结果，是生活和经验的一部分，阐明了习惯、冲动和理智在探究中的作用，将实在和真理融入探究过程，避免了皮尔士所面临的理论困境，使探究更具实践性和动态性。杜威的探究模式为理解人类在现实世界中的活动提供了新的视角，突出了探究在生存和发展中的核心地位。",
+        "abstract": "康德美学是中国美学现代转型的重要理论驱动力。从学科标准层面看，古代中国并未出现过学科意义上的“美学”概念，康德美学的中国传播直接促使了中国美学学科的诞生。从思想标准层面看，康德美学是早期中国现代“启蒙美学”的重要话语资源。对康德美学的启蒙主义应用既根源于康德美学自身的“二重性格”，也与20世纪初期中国现实的特殊境况密切相关。从实践标准层面看，康德美学在美育目的、美育特性以及美育方式上启发了早期中国现代美学家，为中国美学现代转型的最终“落地”提供了保障。尽管导源于康德的这条间性介入美学传统并未成为20世纪中国现代美学的主流，但它在中国审美现代性生成过程中所发挥的重要作用却是不容忽视的。",
         "type": "中文期刊文章",
-        "subject": "探究;杜威;皮尔士;习惯;理智",
+        "subject": "康德美学;中国美学现代转型;学科产生;启蒙美学;美育实践",
         "stream": "核心期刊",
         "core": true,
-        "id": "HHXYXB12026005021",
-        "link": "https://www.ncpssd.cn/Literature/readurl?id=HHXYXB12026005021",
+        "id": "LFSFXYXBSHKXB2026004005",
+        "link": "https://www.ncpssd.cn/Literature/readurl?id=LFSFXYXBSHKXB2026004005",
         "source": "国家哲学社会科学文献中心"
       },
       {
-        "title": "“现代化=西方化” 叙事的认识论批判",
-        "title_en": "An Epistemological Critique of the Narrative that \"Modernization Is Equal to Westernization\"",
+        "title": "纵横捭阖 气象万千——论陈望衡教授《中华美学全史》对中国美学史研究的贡献",
+        "title_en": "Sweeping Breadth and Spectacular Vision: A Brief Discussion on the Contributions of Professor Chen Wangheng's A Complete History of Chinese Aesthetics to the Study of Chinese Aesthetic History",
         "authors": [
-          "罗红杰"
+          "范明华"
         ],
-        "journal": "马克思主义研究",
+        "journal": "湖南工业大学学报：社会科学版",
         "year": "2026",
-        "abstract": "“现代化=西方化”不仅是一种认知迷思，也是意识形态层面的伪命题。必须旗帜鲜明地揭露和驳斥“现代化=西方化”的虚假意识形态本质，阐明中国式现代化的文明意蕴和社会历史效应。“现代化=西方化”实质上是由西方现代化系统生成并维系的虚假表象，旨在构筑起一个掩盖霸权主义和强权政治的虚幻观念体系。中国式现代化在“事实—价值”双重意义上证伪了“现代化=西方化”这一命题，戳穿了其话语霸权本质及意识形态的虚假性，开启了塑造平等、互惠、共生的新秩序的可能性。",
+        "abstract": "陈望衡教授的十卷本《中华美学全史》是迄今篇幅最长、内容最全、体系最完整的一部由个人独力完成的中国美学通史著作。其对美学史研究的贡献集中体现在四个方面：一是对中国美学思想的范围进行了前所未有的“扩容”；二是对中国美学思想的发生进行了更为全面的“溯源”；三是对中国美学思想的演变进行了分门别类的“别流”；四是对中国美学思想的本土特色与精神指向进行了新的“正本”。",
         "type": "中文期刊文章",
-        "subject": "中国式现代化;西方现代化;意识形态;叙事谬误",
+        "subject": "《中华美学全史》;中国美学思想;扩容;溯源;别流;正本",
         "stream": "核心期刊",
         "core": true,
-        "id": "MKSZYYJ2026009013",
-        "link": "https://www.ncpssd.cn/Literature/readurl?id=MKSZYYJ2026009013",
+        "id": "HNGYDXXBSHKXB2026005017",
+        "link": "https://www.ncpssd.cn/Literature/readurl?id=HNGYDXXBSHKXB2026005017",
         "source": "国家哲学社会科学文献中心"
       },
       {
-        "title": "人工智能幻觉的认识论危机：一种生成式认知掩蔽",
-        "title_en": "The Epistemological Crisis of AI Hallucinations: A Generative Epistemic Masking",
+        "title": "“美的灵魂”的复归与情境性实现——席勒对道德主体的美学重塑",
+        "title_en": "The Return and Situated Realization of the \"Beautiful Soul\": Schiller's Aesthetic Reconfiguration of the Moral Subject",
         "authors": [
-          "郁锋"
+          "袁青"
         ],
-        "journal": "山西大学学报：哲学社会科学版",
+        "journal": "哲学动态",
         "year": "2026",
-        "abstract": "生成式人工智能的幻觉问题并非单纯的技术故障，而是源于模型架构的结构性缺陷，导致系统在生成内容时系统性地漠视知识规范和真理标准。从认识论视角提出“生成式认知掩蔽”概念，将幻觉视为一种认识论危机。此种掩蔽区别于传统常识知识问题、人类幻觉的生物适应性机制，以及假消息的意图驱动传播，其特有危害在于动态不可修正的集体知识污染。相较之下，人类认知通过预测加工理论的自证机制，嵌入进化约束和元认知能力，从而实现对真理的规范追踪和适应性优化。当前的元认知干预虽可部分缓解幻觉现象，却无法根除其结构性根源。而面对可靠主义的挑战，外部可靠性优化也不足以化解掩蔽危机。据此，未来人工智能设计须汲取哲学启示，融入自证结构，以桥接人类认知与机器智能的鸿沟，推动认知协同。",
+        "abstract": "针对康德道德哲学中理性法则与情感之间的纠缠，席勒以美学为进路，试图引导主体由对“道德律”的敬重，转向“美的灵魂”的自觉。为此，他构建了一种以“美的灵魂”为理想、以“崇高的灵魂”为现实补充的道德主体结构：前者植根于感性与理性和谐的理想情境，通过意志与感觉自发一致的“共感性动作”外显为“优雅”；后者则生发于感性冲动持续施压的现实情境，经由理性意志自觉选择抵制感性冲动的“意志选择的动作”外显为“尊严”。两者并非彼此替代，而是在不同情境中发挥互补功能，共同构成道德主体的实践可能。这表明，席勒不仅重新安顿了感性在道德主体中的位置，也揭示了主体在理想和谐与现实冲突之间动态维系自由的情境性机制，从而在康德与黑格尔之间构建出一条以美学为中介的道德主体实践路径。",
         "type": "中文期刊文章",
-        "subject": "人工智能幻觉;生成式认知掩蔽;自证机制;元认知干预;可靠主义",
+        "subject": "席勒;康德;道德主体;美的灵魂;崇高的灵魂",
         "stream": "核心期刊",
         "core": true,
-        "id": "SXDXXBZXSHKXB2026005004",
-        "link": "https://www.ncpssd.cn/Literature/readurl?id=SXDXXBZXSHKXB2026005004",
+        "id": "ZXDT2026009010",
+        "link": "https://www.ncpssd.cn/Literature/readurl?id=ZXDT2026009010",
         "source": "国家哲学社会科学文献中心"
       },
       {
