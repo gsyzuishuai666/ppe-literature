@@ -1,2 +1,2 @@
 // 由 ppe_nssd_crawler.py 生成，请勿手动编辑
-window.NSSD_DATA = {"generated_at": "2026-11-09 19:23:15", "source": "国家哲学社会科学文献中心 (https://www.ncpssd.cn/)", "note": "中国社科院主办的国家级哲学社会科学文献平台，免费开放。已按 NSSD 官方学科分类筛选，含核心期刊 / 集刊 / 优先发布文献。", "disciplines": {"政治学": [], "经济学": [], "哲学": []}};
+window.NSSD_DATA = {"generated_at": "2026-11-10 16:54:31", "source": "国家哲学社会科学文献中心 (https://www.ncpssd.cn/)", "note": "中国社科院主办的国家级哲学社会科学文献平台，免费开放。已按 NSSD 官方学科分类筛选，含核心期刊 / 集刊 / 优先发布文献。", "disciplines": {"政治学": [], "经济学": [], "哲学": []}};
